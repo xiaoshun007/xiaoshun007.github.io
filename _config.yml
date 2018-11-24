@@ -78,12 +78,19 @@ theme: pure
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
+- type: git
   repository: git@github.com:xiaoshun007/xiaoshun007.github.io.git
   branch: master
+- type: baidu_url_submitter
 
 # 自动生成sitemap
 sitemap:
   path: sitemap.xml
 baidusitemap:
   path: baidusitemap.xml
+  
+baidu_url_submit:
+  count: 10
+  host: www.xiaoshun.info
+  token: Pcd7kiW3HVZSfzs0
+  path: baidu_urls.txt
