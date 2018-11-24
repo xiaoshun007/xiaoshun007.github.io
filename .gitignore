@@ -4,3 +4,5 @@ db.json
 *.log
 public/
 .deploy*/
+package.json
+package-lock.json
