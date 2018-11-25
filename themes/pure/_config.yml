@@ -108,12 +108,12 @@ github:
 # Gitment
 # Introduction: https://imsun.net/posts/gitment-introduction/
 comment:
-  type: valine  # 启用哪种评论系统
+  type: livere  # 启用哪种评论系统
   disqus:  # enter disqus shortname here
   youyan: 
     uid: 1783844 # enter youyan uid 
   livere:
-    uid: Mi8xLzM= # enter youyan uid 
+    uid: MTAyMC80MTI3MC8xNzgxOA== # enter youyan uid 
   gitment:
     githubID: 
     repo: 
