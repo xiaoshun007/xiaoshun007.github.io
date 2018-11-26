@@ -450,10 +450,10 @@ needmoreshare2:
     options:
       iconStyle: box
       boxForm: horizontal
-      position: bottomCenter
+      position: Right
       networks: Weibo,Wechat,Douban,QQZone,Twitter,Facebook
   float:
-    enable: true
+    enable: false
     options:
       iconStyle: box
       boxForm: horizontal
