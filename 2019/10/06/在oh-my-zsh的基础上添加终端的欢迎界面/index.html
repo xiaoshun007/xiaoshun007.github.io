@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>生产环境一个慢sql引发的血案 | Hexo</title>
+  <meta name="description" content="背景1、运营同学反馈APP突然很卡，应用页面要加载很久才能进入2、收到阿里云RDS cpu使用率100%告警 定位1、登录阿里云，查看慢sql，找到告警sql2、定位log1234567891011121314[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:22.946 [http-nio-8082-exec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="生产环境一个慢sql引发的血案">
+<meta property="og:url" content="http://www.xiaoshun.info/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="背景1、运营同学反馈APP突然很卡，应用页面要加载很久才能进入2、收到阿里云RDS cpu使用率100%告警 定位1、登录阿里云，查看慢sql，找到告警sql2、定位log1234567891011121314[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:22.946 [http-nio-8082-exec">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="evernotecid://FA6DE06C-B660-4CF8-8D25-591119915F1E/appyinxiangcom/495348/ENResource/p122">
+<meta property="og:updated_time" content="2019-10-06T08:17:30.241Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="生产环境一个慢sql引发的血案">
+<meta name="twitter:description" content="背景1、运营同学反馈APP突然很卡，应用页面要加载很久才能进入2、收到阿里云RDS cpu使用率100%告警 定位1、登录阿里云，查看慢sql，找到告警sql2、定位log1234567891011121314[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:22.946 [http-nio-8082-exec">
+<meta name="twitter:image" content="evernotecid://FA6DE06C-B660-4CF8-8D25-591119915F1E/appyinxiangcom/495348/ENResource/p122">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://www.xiaoshun.info/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/cofess" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">ssf</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Java Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Wuhan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">Repository</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">Books</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">Links</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/cofess" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle="tooltip" data-placement="top"><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle="tooltip" data-placement="top"><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+
+    
+      
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/" class="title">生产环境一个慢sql引发的血案</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-10-06T01:49:21.000Z" itemprop="datePublished">2019-10-06</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2018/11/23/hello-world/" class="title">Hello World</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-11-23T13:04:43.000Z" itemprop="datePublished">2018-11-23</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-在oh-my-zsh的基础上添加终端的欢迎界面" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      生产环境一个慢sql引发的血案
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/" class="article-date">
+	  <time datetime="2019-10-06T01:49:21.000Z" itemprop="datePublished">2019-10-06</time>
+	</a>
+</span>
+        
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/#comments" class="article-comment-link">Comments</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>1、运营同学反馈APP突然很卡，应用页面要加载很久才能进入<br>2、收到阿里云RDS cpu使用率100%告警</p>
+<h3 id="定位"><a href="#定位" class="headerlink" title="定位"></a>定位</h3><p>1、登录阿里云，查看慢sql，找到告警sql<br>2、定位log<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:22.946 [http-nio-8082-exec-14] INFO  com.fulu.game.play.shiro.AclFilter - head中的token:PLAY-eef1ba92ffb94add806011c3ae0fdfe1</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:22.946 [http-nio-8082-exec-14] INFO  com.fulu.game.play.shiro.AclFilter - uri:/api/v1/user/wxinfo/soukasave</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:22.951 [http-nio-8082-exec-14] INFO  com.fulu.game.play.shiro.AclFilter - AclFilter验证通过，续存token PLAY-eef1ba92ffb94add806011c3ae0fdfe1</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:25.369 [http-nio-8082-exec-14] INFO  com.fulu.game.play.controller.UserController - 解密之前，用户授权信息:wxUserInfo:WxUserInfo(nickName=大水货, mobile=null, avatarUrl=https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK8DlicOMicTOI1v4kmWMGQ7v9u1Xhs7ASSTD8WHS0Yotjr42LC9Ogpuet1YhwbibL5lda7QbJ6kDBvQ/132, gender=1, city=苏州, province=江苏, country=中国, language=zh_CN, verifyCode=null, encryptedData=T0OmUn8+OEAZz6sQS5qFAluBquBrhw06zQ7ab00JDZXImN9ZCGGYUv0eeeVPnqX3sOWOPu5w6+25P/PDA3u+UCSYEQvT29XBXpDWKvuRSEaCv8kbfQB9mfkGV0/3imv6pHIwTFtxm0NFUwwzmq1uNL6KyVQc6IUGnWJonVVD3kWtSgWRyOxlxhh0QRCMJ4+mib/EgLA9jaAYAlls5npIKdHcGqtSexiLbQaIJ8Su5gKgdCoGCytX9/L13/ggSUNH2TYx0JsB8oHVFIUpX4JTkhSiZLvcPjrNO+qwvgyrwtZkSqIa57ehBOEqovFdc1/HSa4/Kt24VLrInQ4f+Uo+9di2JDVSSbrA617IKIQ5zSmkQze+6cz4IFB11riROT6u7/jqTiGu1wHSp+vHfKPOOKkzneyd9sLkgNwA5+EPBwDroibSQIA5NdYX1pHUiU59524bXtW6OuWSFCP6qJbNpsDkcR3R1RSbDD/IH60BPfWi/gy/MseuUiW6fyGYsZvlyRLhyN8GGncGTCPfrxO3lA==, iv=F4dFycDXXhAI4QmrxTiD+w==)</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:25.370 [http-nio-8082-exec-14] INFO  com.fulu.game.play.controller.UserController - 解密之后，用户授权信息:wxUserInfo:WxMaUserInfo(openId=oDw9p5Ffhh2Qh4apGQrz51VUXmWo, nickName=大水货, gender=1, language=zh_CN, city=苏州, province=江苏, country=中国, avatarUrl=https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK8DlicOMicTOI1v4kmWMGQ7v9u1Xhs7ASSTD8WHS0Yotjr42LC9Ogpuet1YhwbibL5lda7QbJ6kDBvQ/132, unionId=on9xK1CAQnTqh0AAjrhtz4XCB5Dw, watermark=WxMaUserInfo.Watermark(timestamp=1567260682, appid=wx78a0fa23ad04e7dc))</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:25.371 [http-nio-8082-exec-14] INFO  com.fulu.game.core.service.impl.UserServiceImpl - 微信授权用户信息:currentUser:User(id=null, userCode=null, mobile=null, nickname=大水货, gender=1, age=null, constellation=null, birth=null, realname=null, country=中国, province=江苏, city=苏州, headPortraitsUrl=https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK8DlicOMicTOI1v4kmWMGQ7v9u1Xhs7ASSTD8WHS0Yotjr42LC9Ogpuet1YhwbibL5lda7QbJ6kDBvQ/132, idcard=null, type=null, userInfoAuth=null, password=null, salt=null, imId=null, imPsw=null, sourceId=62, balance=null, chargeBalance=null, virtualBalance=null, charm=null, charmDrawSum=null, status=null, memberExp=null, virtualMemberExp=null, appOpenId=null, qqOpenId=null, openId=oDw9p5Ffhh2Qh4apGQrz51VUXmWo, pointOpenId=null, publicOpenId=null, unionId=on9xK1CAQnTqh0AAjrhtz4XCB5Dw, scoreAvg=null, userScore=null, registIp=180.117.225.211, loginIp=180.117.225.211, serverScoreAvg=null, createTime=null, updateTime=Sat Aug 31 22:11:25 CST 2019, loginTime=null, registerType=null, delFlag=null, totalHours=null, activeTime=null, ordersTakeStatus=null)</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:02.519 [http-nio-8082-exec-14] ERROR c.f.game.core.service.impl.UserAccountServiceImpl - 保存用户唯一标识，user为null或uniqueId为空或type非法</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:06.168 [http-nio-8082-exec-14] INFO  c.f.game.core.service.impl.UserAccountServiceImpl - userId：786707、type：11不存在，新增一条userAccount记录：UserAccount(id=null, userId=786707, openId=oDw9p5Ffhh2Qh4apGQrz51VUXmWo, unionId=on9xK1CAQnTqh0AAjrhtz4XCB5Dw, type=11, ext=null, createTime=Sat Aug 31 22:12:02 CST 2019, updateTime=Sat Aug 31 22:12:02 CST 2019)</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:06.219 [http-nio-8082-exec-14] ERROR c.f.game.core.service.impl.UserAccountServiceImpl - 保存用户唯一标识，user为null或uniqueId为空或type非法</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:06.219 [http-nio-8082-exec-14] ERROR c.f.game.core.service.impl.UserAccountServiceImpl - 保存用户唯一标识，user为null或uniqueId为空或type非法</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:06.219 [http-nio-8082-exec-14] ERROR c.f.game.core.service.impl.UserAccountServiceImpl - 保存用户唯一标识，user为null或uniqueId为空或type非法</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:06.369 [http-nio-8082-exec-14] INFO  com.fulu.game.core.service.mq.AbstractMqProducer - 消息到队列：UserEvent [eventType=USER_REGISTER, isAsync=true, exceptionMsg=null, busiId=786707, eventParas=[User(id=786707, userCode=null, mobile=null, nickname=大水货, gender=1, age=null, constellation=null, birth=null, realname=null, country=中国, province=江苏, city=苏州, headPortraitsUrl=https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK8DlicOMicTOI1v4kmWMGQ7v9u1Xhs7ASSTD8WHS0Yotjr42LC9Ogpuet1YhwbibL5lda7QbJ6kDBvQ/132, idcard=null, type=1, userInfoAuth=0, password=null, salt=null, imId=null, imPsw=null, sourceId=62, balance=0, chargeBalance=0, virtualBalance=0, charm=0, charmDrawSum=0, status=1, memberExp=null, virtualMemberExp=null, appOpenId=null, qqOpenId=null, openId=oDw9p5Ffhh2Qh4apGQrz51VUXmWo, pointOpenId=null, publicOpenId=null, unionId=on9xK1CAQnTqh0AAjrhtz4XCB5Dw, scoreAvg=4, userScore=null, registIp=180.117.225.211, loginIp=180.117.225.211, serverScoreAvg=null, createTime=Sat Aug 31 22:11:58 CST 2019, updateTime=Sat Aug 31 22:11:58 CST 2019, loginTime=null, registerType=null, delFlag=null, totalHours=null, activeTime=null, ordersTakeStatus=null)], eventLogId=10737915]</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:06.369 [http-nio-8082-exec-14] INFO  c.f.g.c.s.event.impl.UserEventProducerServiceImpl - 异步发送v2事件完成：eventType=USER_REGISTER，busiId=786707，eventParas=[User(id=786707, userCode=null, mobile=null, nickname=大水货, gender=1, age=null, constellation=null, birth=null, realname=null, country=中国, province=江苏, city=苏州, headPortraitsUrl=https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK8DlicOMicTOI1v4kmWMGQ7v9u1Xhs7ASSTD8WHS0Yotjr42LC9Ogpuet1YhwbibL5lda7QbJ6kDBvQ/132, idcard=null, type=1, userInfoAuth=0, password=null, salt=null, imId=null, imPsw=null, sourceId=62, balance=0, chargeBalance=0, virtualBalance=0, charm=0, charmDrawSum=0, status=1, memberExp=null, virtualMemberExp=null, appOpenId=null, qqOpenId=null, openId=oDw9p5Ffhh2Qh4apGQrz51VUXmWo, pointOpenId=null, publicOpenId=null, unionId=on9xK1CAQnTqh0AAjrhtz4XCB5Dw, scoreAvg=4, userScore=null, registIp=180.117.225.211, loginIp=180.117.225.211, serverScoreAvg=null, createTime=Sat Aug 31 22:11:58 CST 2019, updateTime=Sat Aug 31 22:11:58 CST 2019, loginTime=null, registerType=null, delFlag=null, totalHours=null, activeTime=null, ordersTakeStatus=null)]</span><br><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:06.371 [http-nio-8082-exec-14] INFO  com.fulu.game.core.service.impl.UserServiceImpl - 用户未注册，创建新用户信息:currentUser:User(id=786707, userCode=null, mobile=null, nickname=大水货, gender=1, age=null, constellation=null, birth=null, realname=null, country=中国, province=江苏, city=苏州, headPortraitsUrl=https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK8DlicOMicTOI1v4kmWMGQ7v9u1Xhs7ASSTD8WHS0Yotjr42LC9Ogpuet1YhwbibL5lda7QbJ6kDBvQ/132, idcard=null, type=1, userInfoAuth=0, password=null, salt=null, imId=null, imPsw=null, sourceId=62, balance=0, chargeBalance=0, virtualBalance=0, charm=0, charmDrawSum=0, status=1, memberExp=null, virtualMemberExp=null, appOpenId=null, qqOpenId=null, openId=oDw9p5Ffhh2Qh4apGQrz51VUXmWo, pointOpenId=null, publicOpenId=null, unionId=on9xK1CAQnTqh0AAjrhtz4XCB5Dw, scoreAvg=4, userScore=null, registIp=180.117.225.211, loginIp=180.117.225.211, serverScoreAvg=null, createTime=Sat Aug 31 22:11:58 CST 2019, updateTime=Sat Aug 31 22:11:58 CST 2019, loginTime=null, registerType=null, delFlag=null, totalHours=null, activeTime=null, ordersTakeStatus=null);unionUser:User(id=786707, userCode=null, mobile=null, nickname=大水货, gender=1, age=null, constellation=null, birth=null, realname=null, country=中国, province=江苏, city=苏州, headPortraitsUrl=https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK8DlicOMicTOI1v4kmWMGQ7v9u1Xhs7ASSTD8WHS0Yotjr42LC9Ogpuet1YhwbibL5lda7QbJ6kDBvQ/132, idcard=null, type=1, userInfoAuth=0, password=null, salt=null, imId=null, imPsw=null, sourceId=62, balance=0, chargeBalance=0, virtualBalance=0, charm=0, charmDrawSum=0, status=1, memberExp=null, virtualMemberExp=null, appOpenId=null, qqOpenId=null, openId=oDw9p5Ffhh2Qh4apGQrz51VUXmWo, pointOpenId=null, publicOpenId=null, unionId=on9xK1CAQnTqh0AAjrhtz4XCB5Dw, scoreAvg=4, userScore=null, registIp=180.117.225.211, loginIp=180.117.225.211, serverScoreAvg=null, createTime=Sat Aug 31 22:11:58 CST 2019, updateTime=Sat Aug 31 22:11:58 CST 2019, loginTime=null, registerType=null, delFlag=null, totalHours=null, activeTime=null, ordersTakeStatus=null)</span><br></pre></td></tr></table></figure></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>从上面的log可以看到，在<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:11:25.370 [http-nio-8082-exec-14] INFO  com.fulu.game.play.controller.UserController - 解密之后，用户授权信</span><br></pre></td></tr></table></figure></p>
+<p>到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[mdc_trace_id:33515d14-067b-4615-bb4b-5f1e9ea5b147] 2019-08-31 22:12:02.519 [http-nio-8082-exec-14] ERROR c.f.game.core.service.impl.UserAccountServiceImpl - 保存用户唯一标</span><br></pre></td></tr></table></figure></p>
+<p>耗时将近 1min，找到问题的根源了，那我们就看看具体的代码在执行什么逻辑</p>
+<h3 id="代码定位"><a href="#代码定位" class="headerlink" title="代码定位"></a>代码定位</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">public UserVO saveUnionUser(User currentUser) &#123;</span><br><span class="line">        log.info(&quot;微信授权用户信息:currentUser:&#123;&#125;&quot;, currentUser);</span><br><span class="line">        UserVO resultUser = new UserVO();</span><br><span class="line">        //新注册用户</span><br><span class="line">        if (currentUser.getId() == null) &#123;</span><br><span class="line">            User unionUser = findByUnionId(currentUser.getUnionId());</span><br><span class="line">            if (unionUser != null) &#123;</span><br><span class="line">                BeanUtil.copyProperties(currentUser, unionUser, CopyOptions.create().setIgnoreNullValue(true));</span><br><span class="line">                updateFlush(unionUser);</span><br><span class="line">                log.info(&quot;用户已注册，更新老用户信息:currentUser:&#123;&#125;;unionUser:&#123;&#125;&quot;, currentUser, unionUser);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                unionUser = createNewUser(currentUser);</span><br><span class="line">                updateRedisUser(unionUser);</span><br><span class="line">                log.info(&quot;用户未注册，创建新用户信息:currentUser:&#123;&#125;;unionUser:&#123;&#125;&quot;, currentUser, unionUser);</span><br><span class="line">            &#125;</span><br><span class="line">            BeanUtil.copyProperties(unionUser, resultUser);</span><br><span class="line">            resultUser.setCoupouStatus(Constant.SEND_COUPOU_SUCCESS);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            //老用户</span><br><span class="line">            User unionUser = findByUnionId(currentUser.getUnionId());</span><br><span class="line">            //如果通过unionId查询不到老用户，则更新当前用户成为union用户</span><br><span class="line">            if (unionUser == null) &#123;</span><br><span class="line">                unionUser = currentUser;</span><br><span class="line">                updateFlush(unionUser);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                //查询到老用户的unionId一致，则更新一下当前用户信息即可</span><br><span class="line">                if (unionUser.getId().equals(currentUser.getId())) &#123;</span><br><span class="line">                    //注释原因：解决小程序登录授权用户信息被覆盖</span><br><span class="line">//                    BeanUtil.copyProperties(currentUser, unionUser, CopyOptions.create().setIgnoreNullValue(true));</span><br><span class="line">//                    update(unionUser);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    BeanUtil.copyProperties(currentUser, unionUser, CopyOptions.create().setIgnoreNullValue(true));</span><br><span class="line">                    update(unionUser);</span><br><span class="line">                    log.info(&quot;用户已注册,更新老用户信息:currentUser:&#123;&#125;;unionUser:&#123;&#125;&quot;, currentUser, unionUser);</span><br><span class="line">                    if (currentUser.getPointOpenId() != null) &#123;</span><br><span class="line">                        currentUser.setPointOpenId(unionUser.getId() + &quot;-&quot; + currentUser.getPointOpenId() + &quot;-&quot; + System.currentTimeMillis());</span><br><span class="line">                    &#125;</span><br><span class="line">                    if (currentUser.getPublicOpenId() != null) &#123;</span><br><span class="line">                        currentUser.setPublicOpenId(unionUser.getId() + &quot;-&quot; + currentUser.getPublicOpenId() + &quot;-&quot; + System.currentTimeMillis());</span><br><span class="line">                    &#125;</span><br><span class="line">                    if (currentUser.getOpenId() != null) &#123;</span><br><span class="line">                        currentUser.setPublicOpenId(unionUser.getId() + &quot;-&quot; + currentUser.getOpenId() + &quot;-&quot; + System.currentTimeMillis());</span><br><span class="line">                    &#125;</span><br><span class="line">                    currentUser.setUnionId(unionUser.getId() + &quot;-&quot; + currentUser.getUnionId() + &quot;-&quot; + System.currentTimeMillis());</span><br><span class="line">                    currentUser.setDelFlag(true);</span><br><span class="line">                    log.info(&quot;用户已注册，删除当前用户信息:currentUser:&#123;&#125;&quot;, currentUser);</span><br><span class="line">                    update(currentUser);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            BeanUtil.copyProperties(unionUser, resultUser);</span><br><span class="line">        &#125;</span><br><span class="line">        return resultUser;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>从上面的log可以看出走的是“老用户”逻辑，耗时的地方就是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">User unionUser = findByUnionId(currentUser.getUnionId());</span><br><span class="line">public User findByUnionId(String unionId) &#123;</span><br><span class="line">    if (StringUtils.isEmpty(unionId)) &#123;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line">    //新查询unionId逻辑，从user_account表查</span><br><span class="line">    UserAccount userAccount = userAccountService.findByUnionId(unionId);</span><br><span class="line">    if (userAccount != null) &#123;</span><br><span class="line">        return getUserByAccount(userAccount);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        //老查询逻辑</span><br><span class="line">        UserVO params = new UserVO();</span><br><span class="line">        params.setUnionId(unionId);</span><br><span class="line">        List&lt;User&gt; users = userDao.findByParameter(params);</span><br><span class="line">        return CollectionUtil.isNotEmpty(users) ? users.get(0) : null;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>也就是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UserAccount userAccount = userAccountService.findByUnionId(unionId);</span><br></pre></td></tr></table></figure></p>
+<p>sql<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT id, user_id, open_id, union_id, type&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;, ext, create_time, update_timeFROM t_user_accountWHERE union_id = &apos;on9xK1CAQnTqh0AAjrhtz4XCB5Dw&apos;</span><br></pre></td></tr></table></figure></p>
+<p>sql执行计划<img src="evernotecid://FA6DE06C-B660-4CF8-8D25-591119915F1E/appyinxiangcom/495348/ENResource/p122" alt="b3664e1777eb2adb56740119f64f57e4.png"><br>全表扫描，646909记录</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>优化sql-创建索引</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://www.xiaoshun.info/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/" title="生产环境一个慢sql引发的血案" target="_blank" rel="external">http://www.xiaoshun.info/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/cofess" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/cofess" target="_blank"><span class="text-dark">ssf</span><small class="ml-1x">Java Web Developer &amp; Designer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2018/11/23/hello-world/" title="Hello World"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>$</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>Maybe you could buy me a cup of coffee.</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="Scan Qrcode" title="Scan">
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open alipay app scan this qrcode, buy me a coffee!</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="Scan Qrcode" title="Scan">
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open wechat app scan this qrcode, buy me a coffee!</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> alipay</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> wechat payment</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/cofess" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle="tooltip" data-placement="top"><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle="tooltip" data-placement="top"><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'TP13c0thGlqT1ijNcel2fcJM-gzGzoHsz',
+    appKey: 'LsqzhLD9dHDoksveVEVYpp5F',
+    placeholder: '老铁，你不说两句吗',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
