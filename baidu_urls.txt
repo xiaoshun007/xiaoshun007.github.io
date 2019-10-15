@@ -1,2 +1,3 @@
+http://www.xiaoshun.info/2019/10/12/Springboot集成Prometheus/
 http://www.xiaoshun.info/2019/10/06/在oh-my-zsh的基础上添加终端的欢迎界面/
 http://www.xiaoshun.info/2018/11/23/hello-world/
